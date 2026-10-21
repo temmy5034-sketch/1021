@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>淡水紅毛城｜時光漫步歷史探索網站</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700;900&family=Zen+Old+Mincho:wght@400;700;900&display=swap" rel="stylesheet">
+    <!-- Anime.js for smooth interactivity -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'retro-red': '#C84B31',      /* 復古紅毛城紅 */
+                        'retro-darkred': '#942E19',
+                        'retro-green': '#1E7F78',    /* 綠瓶欄杆/水綠色 */
+                        'retro-teal': '#285855',
+                        'retro-cream': '#F8F1E5',    /* 暖黃紙張色 */
+                        'retro-paper': '#FFFDF9',
+                        'retro-ink': '#2B231F',      /* 濃墨色 */
+                        'retro-yellow': '#E6A13B',   /* 復古橙黃 */
+                    },
+                    fontFamily: {
+                        serif: ['"Noto Serif TC"', '"Zen Old Mincho"', 'serif'],
+                    },
+                    boxShadow: {
+                        'retro': '4px 4px 0px #2B231F',
+                        'retro-lg': '7px 7px 0px #2B231F',
+                        'retro-hover': '2px 2px 0px #2B231F',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        .vintage-bg {
+            background-color: #F8F1E5;
+            background-image: radial-gradient(#C84B31 0.75px, transparent 0.75px), radial-gradient(#1E7F78 0.75px, #F8F1E5 0.75px);
+            background-size: 30px 30px;
+            background-position: 0 0, 15px 15px;
+        }
+
+        .sunburst-bg {
+            background: repeating-conic-gradient(
+                from 0deg,
+                rgba(200, 75, 49, 0.08) 0deg 15deg,
+                transparent 15deg 30deg
+            );
+        }
+
+        /* 滾動揭露與圖片滑入動態 */
+        .fade-in-section {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: opacity, transform;
+        }
+        .fade-in-section.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .slide-in-img {
+            opacity: 0;
+            transform: scale(0.92) translateY(20px);
+            transition: opacity 0.8s ease-out, transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .fade-in-section.is-visible .slide-in-img {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+
+        /* Google 地圖描邊動畫 (SVG Stroke Path) */
+        .map-path {
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            transition: stroke-dashoffset 2.5s ease-in-out;
+        }
+        .fade-in-section.is-visible .map-path {
+            stroke-dashoffset: 0;
+        }
+
+        /* 人物卡片 Hover 互動 */
+        .person-card {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .person-card:hover {
+            transform: translateY(-8px) rotate(1deg);
+            box-shadow: 8px 8px 0px #C84B31;
+        }
+        .person-card:hover .person-img {
+            filter: grayscale(0%) contrast(100%);
+            transform: scale(1.08);
+        }
+
+        /* JS 動態進度條時間軸 */
+        .timeline-line-progress {
+            transition: height 0.1s linear;
+        }
+
+        /* 印章戳印特效 */
+        .stamp-mark {
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
+        }
+        .stamp-mark:hover {
+            transform: scale(1.08) rotate(-3deg);
+        }
+
+        /* 蓋章動畫聲明 */
+        @keyframes stamp-bounce {
+            0% { transform: scale(3) rotate(-15deg); opacity: 0; }
+            50% { transform: scale(0.9) rotate(3deg); opacity: 1; }
+            75% { transform: scale(1.05) rotate(-2deg); }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+        .animate-stamp {
+            animation: stamp-bounce 0.4s ease-out forwards;
+        }
+
+        /* 複刻古蹟風格滾動條 */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F8F1E5;
+            border-left: 1px solid #2B231F;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #C84B31;
+            border: 2px solid #2B231F;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+
+<body class="bg-retro-cream text-retro-ink font-serif leading-relaxed overflow-x-hidden selection:bg-retro-red selection:text-white">
+
+    <nav class="sticky top-0 z-40 bg-retro-cream/95 backdrop-blur-md border-b-2 border-retro-ink py-3 px-4 md:px-8 transition-all">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <a href="#" class="flex items-center gap-3 group">
+                <div class="w-10 h-10 bg-retro-red text-retro-cream flex items-center justify-center font-bold text-xl border-2 border-retro-ink shadow-retro group-hover:bg-retro-green transition-colors">
+                    城
+                </div>
+                <div>
+                    <span class="font-black text-xl tracking-wider block leading-none text-retro-red">淡水紅毛城</span>
+                    <span class="text-xs text-retro-teal tracking-widest font-bold">SAN DOMINGO & SAN ANTONIO</span>
+                </div>
+            </a>
+
+            <!-- 桌長導覽連結 -->
+            <div class="hidden md:flex items-center gap-6 font-bold text-base">
+                <a href="#about" class="hover:text-retro-red transition-colors relative py-1">紅毛城簡介</a>
+                <a href="#timeline" class="hover:text-retro-red transition-colors relative py-1">歷史時間軸</a>
+                <a href="#stamps" class="hover:text-retro-red transition-colors relative py-1">紀念章巡禮</a>
+                <a href="#map" class="hover:text-retro-red transition-colors relative py-1">古蹟區域地圖</a>
+                <a href="#figures" class="hover:text-retro-red transition-colors relative py-1">歷史人物</a>
+                <a href="#travel" class="hover:text-retro-red transition-colors relative py-1">夕照與咖啡</a>
+            </div>
+
+            <!-- 行動裝置選單按鈕 -->
+            <button id="menu-btn" class="md:hidden w-10 h-10 border-2 border-retro-ink bg-retro-paper shadow-retro flex items-center justify-center text-retro-ink focus:outline-none" aria-label="切換選單">
+                <i class="fa-solid fa-bars text-lg"></i>
+            </button>
+        </div>
+
+        <div id="mobile-menu" class="hidden md:hidden border-t-2 border-retro-ink mt-3 pt-3 pb-2 px-2 flex flex-col gap-3 font-bold bg-retro-paper">
+            <a href="#about" class="p-2 hover:bg-retro-red hover:text-white rounded">紅毛城簡介</a>
+            <a href="#timeline" class="p-2 hover:bg-retro-red hover:text-white rounded">歷史時間軸</a>
+            <a href="#stamps" class="p-2 hover:bg-retro-red hover:text-white rounded">紀念章巡禮</a>
+            <a href="#map" class="p-2 hover:bg-retro-red hover:text-white rounded">古蹟區域地圖</a>
+            <a href="#figures" class="p-2 hover:bg-retro-red hover:text-white rounded">歷史風雲人物</a>
+            <a href="#travel" class="p-2 hover:bg-retro-red hover:text-white rounded">漫遊夕照咖啡</a>
+        </div>
+    </nav>
+
+    <header class="relative py-12 md:py-20 px-4 overflow-hidden border-b-4 border-retro-ink sunburst-bg">
+        <!-- 復古戳印背景裝飾點綴 (Stamp Overlay) -->
+        <div class="absolute top-6 right-6 opacity-20 pointer-events-none hidden md:block transform rotate-12 scale-125">
+            <svg width="150" height="150" viewBox="0 0 200 200" fill="none" stroke="#2B231F" stroke-width="3">
+                <circle cx="100" cy="100" r="90" stroke-dasharray="6 4" />
+                <circle cx="100" cy="100" r="80" />
+                <text x="100" y="70" text-anchor="middle" font-weight="900" font-size="16" fill="#2B231F">淡水古蹟博物館</text>
+                <text x="100" y="110" text-anchor="middle" font-weight="900" font-size="28" fill="#C84B31">紅毛城</text>
+                <text x="100" y="145" text-anchor="middle" font-weight="700" font-size="14" fill="#2B231F">TAMSUI 1629</text>
+            </svg>
+        </div>
+
+        <div class="max-w-4xl mx-auto text-center relative z-10">
+            <div class="inline-block bg-retro-green text-retro-cream font-bold px-4 py-1 border-2 border-retro-ink shadow-retro mb-6 text-sm md:text-base tracking-widest uppercase transform -rotate-1">
+                ★ 臺灣三百二十年風華絕代歷史名城 ★
+            </div>
+
+            <h1 id="hero-title" class="text-4xl sm:text-6xl md:text-7xl font-black text-retro-red tracking-tight leading-none mb-4 drop-shadow-[2px_2px_0px_#2B231F] transition-all duration-1000 opacity-0 transform scale-95">
+                淡水紅毛城
+            </h1>
+            <p class="text-lg sm:text-2xl font-bold text-retro-teal mb-8 tracking-widest">
+                三百年北臺灣海防樞紐 ‧ 拱廊與綠瓶的歷史交響
+            </p>
+
+            <div class="relative max-w-2xl mx-auto bg-retro-paper p-4 md:p-6 border-4 border-retro-ink shadow-retro-lg mb-8 rounded-lg group">
+                <div class="overflow-hidden border-2 border-retro-ink relative aspect-video bg-retro-cream flex items-center justify-center">
+                    <img src="https://images.unsplash.com/photo-1570168007204-dfb528c6958f?auto=format&fit=crop&w=1200&q=80" 
+                         alt="淡水紅毛城主堡實景" 
+                         class="w-full h-full object-cover contrast-110 hover:scale-105 transition-all duration-700"
+                         onerror="this.onerror=null; this.src='https://placehold.co/800x450/C84B31/FFF?text=淡水紅毛城古蹟';">
+                    
+                    <div class="absolute bottom-3 right-3 bg-retro-red text-white text-xs font-black p-2 rounded border-2 border-retro-ink shadow-retro transform rotate-3">
+                        淡水八景之一<br>「戍台夕照」
+                    </div>
+                </div>
+
+                <div class="mt-4 flex flex-wrap justify-between items-center text-xs md:text-sm font-bold text-retro-ink gap-2 border-t-2 border-dashed border-retro-ink pt-3">
+                    <span><i class="fa-solid fa-location-dot text-retro-red"></i> 新北市淡水區中正路28巷1號</span>
+                    <span class="bg-retro-yellow px-2 py-0.5 border border-retro-ink">西元1629年始建</span>
+                    <span><i class="fa-solid fa-ship text-retro-green"></i> 淡水河口重要勝景</span>
+                </div>
+            </div>
+
+            <div class="flex flex-wrap justify-center gap-4">
+                <a href="#stamps" class="bg-retro-yellow text-retro-ink hover:bg-amber-400 font-bold px-6 py-3 border-2 border-retro-ink shadow-retro hover:shadow-retro-hover transition-all flex items-center gap-2">
+                    <i class="fa-solid fa-stamp"></i> 體驗線上記念集章
+                </a>
+                <a href="#map" class="bg-retro-red text-white hover:bg-retro-darkred font-bold px-6 py-3 border-2 border-retro-ink shadow-retro hover:shadow-retro-hover transition-all flex items-center gap-2">
+                    <i class="fa-solid fa-map-location-dot"></i> 開始探尋古蹟地圖
+                </a>
+                <a href="#timeline" class="bg-retro-green text-white hover:bg-retro-teal font-bold px-6 py-3 border-2 border-retro-ink shadow-retro hover:shadow-retro-hover transition-all flex items-center gap-2">
+                    <i class="fa-solid fa-hourglass-half"></i> 動態歷史時間軸
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <section id="about" class="py-16 px-4 max-w-5xl mx-auto fade-in-section relative">
+        <div class="bg-retro-paper p-6 md:p-10 border-4 border-retro-ink shadow-retro-lg relative">
+            <div class="absolute -top-5 left-1/2 transform -translate-x-1/2 bg-retro-yellow text-retro-ink px-6 py-1 font-black text-lg border-2 border-retro-ink shadow-retro">
+                【 歷史概觀 ‧ 最耀眼的古蹟 】
+            </div>
+
+            <div class="grid md:grid-cols-12 gap-8 items-center mt-4">
+                <div class="md:col-span-7 space-y-4 text-base md:text-lg leading-relaxed text-justify">
+                    <p class="first-letter:text-4xl first-letter:font-black first-letter:text-retro-red first-letter:mr-2 first-letter:float-left">
+                        有三百多年歷史的紅毛城可說是淡水最耀眼的古蹟建築。1629年西班牙人侵略淡水，為鞏固其在北臺灣的殖民事業，遂在此建「聖多明哥城」為基地；1642年，荷蘭人驅逐了西人，在舊址重建該城，當時稱荷蘭人為「紅毛」，因此「紅毛城」之名也沿用至今。
+                    </p>
+                    <p>
+                        1867年為英國所租借，乃大肆整修，並在東側建「英國領事館」，做為官邸。領事館的紅色拱廊、綠瓶欄杆，與紅毛城相互輝映，增色不少。
+                    </p>
+                    <p class="bg-retro-cream p-3 border-l-4 border-retro-red italic text-sm md:text-base">
+                        「紅毛城一直到民國69年（西元1980年）才收回接管。由此俯視淡水河，形勢險要，『戍台夕照』素為淡水八景之一，集古蹟與勝景於一處。」
+                    </p>
+                </div>
+
+                <div class="md:col-span-5 space-y-4">
+                    <!-- 照片展示 1: 前英國領事官邸實景照片 (修正缺失圖片與高解析備用) -->
+                    <div class="border-2 border-retro-ink p-2 bg-retro-paper shadow-retro group slide-in-img">
+                        <div class="overflow-hidden border border-retro-ink rounded bg-retro-cream">
+                            <img src="https://images.unsplash.com/photo-1548625361-18302322a3d0?auto=format&fit=crop&w=800&q=80" 
+                                 alt="前英國領事官邸（雙層紅磚拱廊與綠瓶欄杆）" 
+                                 class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500"
+                                 onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=800&q=80';">
+                        </div>
+                        <p class="text-xs font-bold text-center mt-2 text-retro-red">前英國領事官邸（雙層紅磚拱廊與綠釉瓶欄杆）</p>
+                    </div>
+
+                    <!-- 照片展示 2: 淡水河口夕照 -->
+                    <div class="border-2 border-retro-ink p-2 bg-retro-paper shadow-retro group slide-in-img" style="transition-delay: 0.2s;">
+                        <div class="overflow-hidden border border-retro-ink rounded bg-retro-cream">
+                            <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80" 
+                                 alt="淡水河口夕陽餘暉" 
+                                 class="w-full h-36 object-cover group-hover:scale-105 transition-transform duration-500">
+                        </div>
+                        <p class="text-xs font-bold text-center mt-2 text-retro-teal">「戍台夕照」俯視淡水河口與觀音山景</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="timeline" class="py-16 bg-retro-cream border-t-2 border-b-2 border-retro-ink relative">
+        <div class="max-w-5xl mx-auto px-4">
+            <div class="text-center mb-12">
+                <span class="text-retro-green font-bold tracking-widest block text-sm">DYNAMIC HISTORICAL CHRONOLOGY</span>
+                <h2 class="text-3xl md:text-5xl font-black text-retro-ink">歷史時間軸</h2>
+                <p class="text-retro-teal font-bold mt-2 text-sm">（隨著向下滾動線條延伸，點擊可開啟詳細歷史紀事）</p>
+            </div>
+
+            <!-- 時間軸容器 (JS 控制線條滾動動態) -->
+            <div id="timeline-container" class="relative pl-6 md:pl-0">
+                <!-- 中央灰色基底線 -->
+                <div class="absolute left-6 md:left-1/2 top-0 bottom-0 w-1 bg-retro-ink/20 transform -translate-x-1/2"></div>
+                <!-- JS 動態繪製延伸線 -->
+                <div id="timeline-progress-line" class="absolute left-6 md:left-1/2 top-0 w-1 bg-retro-red transform -translate-x-1/2 timeline-line-progress h-0"></div>
+
+                <div class="space-y-12 relative z-10">
+                    <!-- 1629 西班牙建城 -->
+                    <div class="timeline-item relative flex flex-col md:flex-row items-center cursor-pointer group" onclick="openHistoryModal(1629)">
+                        <div class="md:w-1/2 md:pr-10 md:text-right w-full pl-8 md:pl-0">
+                            <div class="bg-retro-paper p-5 border-2 border-retro-ink shadow-retro group-hover:bg-retro-yellow/20 transition-all">
+                                <span class="bg-retro-red text-white text-xs font-bold px-2 py-0.5 border border-retro-ink">西元 1629 年</span>
+                                <h3 class="text-xl font-black text-retro-ink mt-1">西班牙建立「聖多明哥城」</h3>
+                                <p class="text-xs text-retro-ink/80 mt-1">點擊檢視西班牙築城圖繪與歷史背景...</p>
+                            </div>
+                        </div>
+                        <div class="absolute left-0 md:left-1/2 transform -translate-x-1/2 w-8 h-8 bg-retro-red border-2 border-retro-ink rounded-full flex items-center justify-center text-white font-bold text-xs shadow-retro group-hover:scale-125 transition-transform">
+                            西
+                        </div>
+                        <div class="hidden md:block md:w-1/2 md:pl-10"></div>
+                    </div>
+
+                    <!-- 1642 荷蘭安東尼堡 -->
+                    <div class="timeline-item relative flex flex-col md:flex-row items-center cursor-pointer group" onclick="openHistoryModal(1642)">
+                        <div class="hidden md:block md:w-1/2 md:pr-10"></div>
+                        <div class="absolute left-0 md:left-1/2 transform -translate-x-1/2 w-8 h-8 bg-retro-green border-2 border-retro-ink rounded-full flex items-center justify-center text-white font-bold text-xs shadow-retro group-hover:scale-125 transition-transform">
+                            荷
+                        </div>
+                        <div class="md:w-1/2 md:pl-10 w-full pl-8 md:pl-0">
+                            <div class="bg-retro-paper p-5 border-2 border-retro-ink shadow-retro group-hover:bg-retro-yellow/20 transition-all">
+                                <span class="bg-retro-green text-white text-xs font-bold px-2 py-0.5 border border-retro-ink">西元 1642 年</span>
+                                <h3 class="text-xl font-black text-retro-ink mt-1">荷蘭重建「安東尼堡」（紅毛城）</h3>
+                                <p class="text-xs text-retro-ink/80 mt-1">點擊檢視荷蘭防衛城堡結構說明...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 1867 英國租借領事館 -->
+                    <div class="timeline-item relative flex flex-col md:flex-row items-center cursor-pointer group" onclick="openHistoryModal(1867)">
+                        <div class="md:w-1/2 md:pr-10 md:text-right w-full pl-8 md:pl-0">
+                            <div class="bg-retro-paper p-5 border-2 border-retro-ink shadow-retro group-hover:bg-retro-yellow/20 transition-all">
+                                <span class="bg-retro-yellow text-retro-ink text-xs font-bold px-2 py-0.5 border border-retro-ink">西元 1867 年</span>
+                                <h3 class="text-xl font-black text-retro-ink mt-1">英國租借與增建領事官邸</h3>
+                                <p class="text-xs text-retro-ink/80 mt-1">點擊檢視維多利亞時代洋樓建築美學...</p>
+                            </div>
+                        </div>
+                        <div class="absolute left-0 md:left-1/2 transform -translate-x-1/2 w-8 h-8 bg-retro-yellow border-2 border-retro-ink rounded-full flex items-center justify-center text-retro-ink font-bold text-xs shadow-retro group-hover:scale-125 transition-transform">
+                            英
+                        </div>
+                        <div class="hidden md:block md:w-1/2 md:pl-10"></div>
+                    </div>
+
+                    <!-- 1980 官方收回接管 -->
+                    <div class="timeline-item relative flex flex-col md:flex-row items-center cursor-pointer group" onclick="openHistoryModal(1980)">
+                        <div class="hidden md:block md:w-1/2 md:pr-10"></div>
+                        <div class="absolute left-0 md:left-1/2 transform -translate-x-1/2 w-8 h-8 bg-retro-red border-2 border-retro-ink rounded-full flex items-center justify-center text-white font-bold text-xs shadow-retro group-hover:scale-125 transition-transform">
+                            國
+                        </div>
+                        <div class="md:w-1/2 md:pl-10 w-full pl-8 md:pl-0">
+                            <div class="bg-retro-paper p-5 border-2 border-retro-ink shadow-retro group-hover:bg-retro-yellow/20 transition-all">
+                                <span class="bg-retro-red text-white text-xs font-bold px-2 py-0.5 border border-retro-ink">民國69年 (1980年)</span>
+                                <h3 class="text-xl font-black text-retro-ink mt-1">政府正式收回接管並列為國定古蹟</h3>
+                                <p class="text-xs text-retro-ink/80 mt-1">點擊檢視古蹟保護與觀光發展...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="stamps" class="py-16 px-4 max-w-6xl mx-auto fade-in-section">
+        <div class="text-center mb-10">
+            <span class="text-retro-red font-bold tracking-widest block text-sm">HERITAGE STAMP COLLECTION</span>
+            <h2 class="text-3xl md:text-5xl font-black text-retro-ink">淡水古蹟紀念章巡禮</h2>
+            <p class="text-retro-teal font-bold mt-2 text-sm md:text-base">（點擊集章框即可體驗經典版畫木刻鋼印蓋章動畫）</p>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-8">
+            <!-- 紀念章 1: 紅毛城主堡 (依據使用者提供圖檔精細重現) -->
+            <div class="bg-retro-paper p-6 border-4 border-retro-ink shadow-retro-lg flex flex-col items-center text-center rounded-xl relative group">
+                <div class="w-full aspect-square border-2 border-dashed border-retro-ink bg-retro-cream rounded-lg flex flex-col items-center justify-center relative overflow-hidden cursor-pointer" onclick="triggerStamp(1)">
+                    <!-- 未蓋章時提示 -->
+                    <div id="stamp-placeholder-1" class="flex flex-col items-center text-retro-ink/50 group-hover:text-retro-red transition-colors">
+                        <i class="fa-solid fa-stamp text-4xl mb-2"></i>
+                        <span class="font-bold text-sm">點擊蓋上【紅毛城】紀念章</span>
+                    </div>
+
+                    <!-- 蓋章內容（重現使用者提供的紅毛城黑白線條鋼印樣式） -->
+                    <div id="stamp-mark-1" class="hidden absolute inset-0 p-4 flex flex-col items-center justify-center bg-white/60 backdrop-blur-[1px]">
+                        <svg viewBox="0 0 300 300" class="w-full h-full stroke-current text-retro-ink fill-none" stroke-width="2">
+                            <!-- 旗幟與城堡線條描繪 -->
+                            <path d="M 170 30 L 170 80 M 170 30 L 205 42 L 170 54 Z" fill="#2B231F" />
+                            <rect x="155" y="80" width="30" height="30" fill="none" stroke="#2B231F" stroke-width="3"/>
+                            <!-- 主堡本體結構 -->
+                            <polygon points="90,140 240,110 270,180 120,220" fill="none" stroke="#2B231F" stroke-width="4"/>
+                            <polygon points="90,140 120,220 50,190 40,150" fill="none" stroke="#2B231F" stroke-width="3"/>
+                            <!-- 下方基座與城牆 -->
+                            <path d="M 30 200 L 130 230 L 280 185" stroke="#2B231F" stroke-width="5"/>
+                            <path d="M 40 230 L 140 260 L 280 215" stroke="#2B231F" stroke-width="3"/>
+                            <!-- 紀念章文字標籤 -->
+                            <text x="150" y="275" font-family="serif" font-weight="900" font-size="20" fill="#2B231F" text-anchor="middle">紅毛城</text>
+                            <text x="85" y="275" font-family="sans-serif" font-weight="bold" font-size="10" fill="#2B231F">淡水古蹟博物館</text>
+                        </svg>
+                        <span class="bg-retro-red text-white text-[10px] font-bold px-2 py-0.5 rounded border border-retro-ink mt-1">已成功收集章戳</span>
+                    </div>
+                </div>
+                <h3 class="font-black text-xl text-retro-ink mt-4">01. 安東尼堡鋼印戳章</h3>
+                <p class="text-xs text-retro-ink/80 mt-1">重現淡水古蹟博物館經典經典版畫戳章風格。</p>
+            </div>
+
+            <!-- 紀念章 2: 英國領事館 (拱廊綠瓶章) -->
+            <div class="bg-retro-paper p-6 border-4 border-retro-ink shadow-retro-lg flex flex-col items-center text-center rounded-xl relative group">
+                <div class="w-full aspect-square border-2 border-dashed border-retro-ink bg-retro-cream rounded-lg flex flex-col items-center justify-center relative overflow-hidden cursor-pointer" onclick="triggerStamp(2)">
+                    <div id="stamp-placeholder-2" class="flex flex-col items-center text-retro-ink/50 group-hover:text-retro-green transition-colors">
+                        <i class="fa-solid fa-building-columns text-4xl mb-2"></i>
+                        <span class="font-bold text-sm">點擊蓋上【領事館】紀念章</span>
+                    </div>
+
+                    <div id="stamp-mark-2" class="hidden absolute inset-0 p-4 flex flex-col items-center justify-center bg-white/60 backdrop-blur-[1px]">
+                        <svg viewBox="0 0 300 300" class="w-full h-full stroke-current text-retro-teal fill-none" stroke-width="2">
+                            <circle cx="150" cy="140" r="110" stroke-dasharray="6 4" stroke-width="3"/>
+                            <path d="M 60 160 Q 85 110 110 160 Q 135 110 160 160 Q 185 110 210 160 Q 235 110 240 160" stroke-width="4"/>
+                            <rect x="50" y="160" width="200" height="20" fill="none" stroke-width="3"/>
+                            <text x="150" y="220" font-family="serif" font-weight="900" font-size="22" fill="#1E7F78" text-anchor="middle">前英國領事官邸</text>
+                            <text x="150" y="245" font-family="serif" font-weight="bold" font-size="12" fill="#2B231F" text-anchor="middle">維多利亞雙層拱廊美學</text>
+                        </svg>
+                        <span class="bg-retro-green text-white text-[10px] font-bold px-2 py-0.5 rounded border border-retro-ink mt-1">已成功收集章戳</span>
+                    </div>
+                </div>
+                <h3 class="font-black text-xl text-retro-ink mt-4">02. 維多利亞拱廊戳章</h3>
+                <p class="text-xs text-retro-ink/80 mt-1">紀念英國領事官邸精美的紅磚半圓拱廊。</p>
+            </div>
+
+            <!-- 紀念章 3: 戍台夕照 (淡水河觀音山章) -->
+            <div class="bg-retro-paper p-6 border-4 border-retro-ink shadow-retro-lg flex flex-col items-center text-center rounded-xl relative group">
+                <div class="w-full aspect-square border-2 border-dashed border-retro-ink bg-retro-cream rounded-lg flex flex-col items-center justify-center relative overflow-hidden cursor-pointer" onclick="triggerStamp(3)">
+                    <div id="stamp-placeholder-3" class="flex flex-col items-center text-retro-ink/50 group-hover:text-retro-yellow transition-colors">
+                        <i class="fa-solid fa-sun text-4xl mb-2"></i>
+                        <span class="font-bold text-sm">點擊蓋上【戍台夕照】紀念章</span>
+                    </div>
+
+                    <div id="stamp-mark-3" class="hidden absolute inset-0 p-4 flex flex-col items-center justify-center bg-white/60 backdrop-blur-[1px]">
+                        <svg viewBox="0 0 300 300" class="w-full h-full stroke-current text-retro-darkred fill-none" stroke-width="2">
+                            <circle cx="150" cy="120" r="40" fill="#E6A13B" opacity="0.3"/>
+                            <path d="M 40 180 C 100 140, 200 140, 260 180" stroke-width="4"/>
+                            <path d="M 30 200 C 110 180, 190 220, 270 190" stroke-width="3"/>
+                            <text x="150" y="240" font-family="serif" font-weight="900" font-size="22" fill="#C84B31" text-anchor="middle">淡水八景 ‧ 戍台夕照</text>
+                        </svg>
+                        <span class="bg-retro-yellow text-retro-ink text-[10px] font-bold px-2 py-0.5 rounded border border-retro-ink mt-1">已成功收集章戳</span>
+                    </div>
+                </div>
+                <h3 class="font-black text-xl text-retro-ink mt-4">03. 戍台夕照觀景章</h3>
+                <p class="text-xs text-retro-ink/80 mt-1">象徵淡水河口夕陽與觀音山相輝映之絕景。</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="map" class="py-16 px-4 max-w-6xl mx-auto fade-in-section">
+        <div class="text-center mb-10">
+            <span class="text-retro-red font-bold tracking-widest block text-sm">EXPLORE MONUMENT REGION</span>
+            <h2 class="text-3xl md:text-5xl font-black text-retro-ink">古蹟區域探索地圖</h2>
+            <p class="text-retro-teal font-bold mt-2 text-sm md:text-base">（Google 地圖視覺風格 ‧ 滾動自動展繪動態路線與地標）</p>
+        </div>
+
+        <div class="grid lg:grid-cols-12 gap-8 items-start">
+            <!-- Google Maps 樣式畫布區 -->
+            <div class="lg:col-span-8 bg-white p-3 border-4 border-retro-ink shadow-retro-lg relative rounded-xl overflow-hidden">
+                <!-- 地圖頂部 Google Maps 搜尋欄與標籤 UI -->
+                <div class="absolute top-6 left-6 z-20 bg-white border border-gray-300 shadow-md rounded-lg px-4 py-2 flex items-center gap-3 text-xs md:text-sm font-sans font-medium text-gray-700">
+                    <i class="fa-solid fa-magnifying-glass text-blue-500"></i>
+                    <span>淡水紅毛城園區 (Fort San Domingo)</span>
+                    <span class="bg-blue-100 text-blue-700 text-[10px] font-bold px-2 py-0.5 rounded-full">古蹟園區</span>
+                </div>
+
+                <div class="relative aspect-[4/3] w-full bg-[#E5E3DF] rounded-lg overflow-hidden border border-gray-300">
+                    <!-- Google Maps 向量畫布 (水域, 綠地, 道路與繪製動畫路線) -->
+                    <svg class="w-full h-full absolute inset-0" viewBox="0 0 800 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <!-- 淡水河水域 (Google Maps 淺藍色) -->
+                        <path d="M 0 380 C 220 370, 420 460, 800 400 L 800 600 L 0 600 Z" fill="#AAD3DF" />
+                        
+                        <!-- 觀音山/對岸綠地 -->
+                        <path d="M 500 450 C 600 360, 720 420, 800 430 L 800 600 L 500 600 Z" fill="#C4E1C5" opacity="0.7"/>
+                        <text x="620" y="520" font-family="sans-serif" font-size="14" font-weight="600" fill="#4B7A52">觀音山風景區</text>
+                        <text x="280" y="520" font-family="sans-serif" font-size="16" font-weight="bold" fill="#3D7280">淡水河 (Tamsui River)</text>
+
+                        <!-- 紅毛城園區綠地 (Google Maps 公園淺綠色) -->
+                        <polygon points="120,120 720,120 760,350 80,350" fill="#C8F0D3" stroke="#A2D9B1" stroke-width="2"/>
+                        <text x="140" y="150" font-family="sans-serif" font-size="13" font-weight="bold" fill="#2E6930">淡水紅毛城園區綠地</text>
+
+                        <!-- 主要道路 (Google Maps 黃色/白色幹道) -->
+                        <path d="M 0 360 C 230 350, 430 440, 800 380" stroke="#FFF" stroke-width="16" />
+                        <path d="M 0 360 C 230 350, 430 440, 800 380" stroke="#FFD875" stroke-width="10" />
+                        <text x="380" y="380" font-family="sans-serif" font-size="11" font-weight="bold" fill="#7A6211" transform="rotate(8, 380, 380)">中正路 (淡水老街方向)</text>
+
+                        <!-- 園區動態導覽路線（動態描邊條） -->
+                        <path class="map-path" d="M 220 340 L 250 210 L 480 230 L 460 330" stroke="#C84B31" stroke-width="4" stroke-linecap="round" stroke-dasharray="8 6"/>
+                    </svg>
+
+                    <!-- Google Maps 樣式 Pin 地標 A: 紅毛城主堡 -->
+                    <button onclick="selectSpot(1)" class="absolute top-[35%] left-[32%] group focus:outline-none transition-transform hover:scale-110" style="transform: translate(-50%, -100%);">
+                        <div class="relative flex flex-col items-center">
+                            <div class="bg-red-600 text-white font-bold text-xs px-2 py-1 rounded-md shadow-lg border border-white whitespace-nowrap mb-1">
+                                <i class="fa-solid fa-fort-awesome mr-1"></i> A. 主堡 (安東尼堡)
+                            </div>
+                            <div class="w-8 h-8 bg-red-600 rounded-full border-2 border-white shadow-md flex items-center justify-center text-white font-bold">
+                                A
+                            </div>
+                            <div class="w-2 h-2 bg-red-600 rotate-45 -mt-1"></div>
+                        </div>
+                    </button>
+
+                    <!-- Google Maps 樣式 Pin 地標 B: 前英國領事官邸 -->
+                    <button onclick="selectSpot(2)" class="absolute top-[38%] left-[60%] group focus:outline-none transition-transform hover:scale-110" style="transform: translate(-50%, -100%);">
+                        <div class="relative flex flex-col items-center">
+                            <div class="bg-blue-600 text-white font-bold text-xs px-2 py-1 rounded-md shadow-lg border border-white whitespace-nowrap mb-1">
+                                <i class="fa-solid fa-building-columns mr-1"></i> B. 前英國領事官邸
+                            </div>
+                            <div class="w-8 h-8 bg-blue-600 rounded-full border-2 border-white shadow-md flex items-center justify-center text-white font-bold">
+                                B
+                            </div>
+                            <div class="w-2 h-2 bg-blue-600 rotate-45 -mt-1"></div>
+                        </div>
+                    </button>
+
+                    <!-- Google Maps 樣式 Pin 地標 C: 南門古砲區 -->
+                    <button onclick="selectSpot(3)" class="absolute top-[58%] left-[28%] group focus:outline-none transition-transform hover:scale-110" style="transform: translate(-50%, -100%);">
+                        <div class="relative flex flex-col items-center">
+                            <div class="bg-amber-600 text-white font-bold text-xs px-2 py-1 rounded-md shadow-lg border border-white whitespace-nowrap mb-1">
+                                <i class="fa-solid fa-shield-halved mr-1"></i> C. 南門古砲區
+                            </div>
+                            <div class="w-8 h-8 bg-amber-600 rounded-full border-2 border-white shadow-md flex items-center justify-center text-white font-bold">
+                                C
+                            </div>
+                            <div class="w-2 h-2 bg-amber-600 rotate-45 -mt-1"></div>
+                        </div>
+                    </button>
+
+                    <!-- Google Maps 樣式 Pin 地標 D: 夕照平台與咖啡餐廳 -->
+                    <button onclick="selectSpot(4)" class="absolute top-[56%] left-[58%] group focus:outline-none transition-transform hover:scale-110" style="transform: translate(-50%, -100%);">
+                        <div class="relative flex flex-col items-center">
+                            <div class="bg-emerald-600 text-white font-bold text-xs px-2 py-1 rounded-md shadow-lg border border-white whitespace-nowrap mb-1">
+                                <i class="fa-solid fa-utensils mr-1"></i> D. 夕照咖啡觀景區
+                            </div>
+                            <div class="w-8 h-8 bg-emerald-600 rounded-full border-2 border-white shadow-md flex items-center justify-center text-white font-bold">
+                                D
+                            </div>
+                            <div class="w-2 h-2 bg-emerald-600 rotate-45 -mt-1"></div>
+                        </div>
+                    </button>
+
+                    <div class="absolute bottom-2 right-2 bg-white/80 backdrop-blur px-2 py-0.5 rounded text-[10px] font-sans text-gray-500 shadow border border-gray-200">
+                        Google 地圖風格樣式 ‧ 淡水歷史特區
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右側切換資訊卡片 -->
+            <div class="lg:col-span-4 bg-retro-paper p-6 border-4 border-retro-ink shadow-retro-lg flex flex-col justify-between h-full rounded-xl">
+                <div id="spot-info">
+                    <div class="inline-block bg-retro-red text-white text-xs font-bold px-2 py-1 mb-2 border border-retro-ink">
+                        地圖點位 A
+                    </div>
+                    <h3 class="text-2xl font-black text-retro-ink mb-3">紅毛城主堡 (安東尼堡)</h3>
+                    <div class="border-b-2 border-retro-ink pb-3 mb-4">
+                        <img id="spot-img" src="https://images.unsplash.com/photo-1570168007204-dfb528c6958f?auto=format&fit=crop&w=600&q=80" 
+                             alt="地點圖片" class="w-full h-44 object-cover border-2 border-retro-ink mb-2 rounded">
+                    </div>
+                    <p id="spot-desc" class="text-sm leading-relaxed text-retro-ink/90">
+                        1642年荷蘭人於舊址重建之正方形城堡，牆厚深實，兼具防衛與指揮功能。外牆塗上鮮紅朱漆，是「紅毛城」最顯眼的建築象徵。
+                    </p>
+                </div>
+
+                <div class="mt-6 pt-4 border-t-2 border-dashed border-retro-ink">
+                    <span class="text-xs font-bold text-retro-teal block mb-2">快速導覽區域按鈕：</span>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="selectSpot(1)" class="text-xs font-bold bg-retro-cream hover:bg-retro-red hover:text-white border border-retro-ink p-2 transition-colors rounded">A. 主堡正樓</button>
+                        <button onclick="selectSpot(2)" class="text-xs font-bold bg-retro-cream hover:bg-retro-green hover:text-white border border-retro-ink p-2 transition-colors rounded">B. 英國領事館</button>
+                        <button onclick="selectSpot(3)" class="text-xs font-bold bg-retro-cream hover:bg-retro-yellow border border-retro-ink p-2 transition-colors rounded">C. 南門古砲區</button>
+                        <button onclick="selectSpot(4)" class="text-xs font-bold bg-retro-cream hover:bg-retro-red hover:text-white border border-retro-ink p-2 transition-colors rounded">D. 觀景夕照區</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="figures" class="py-16 bg-retro-paper border-t-2 border-b-2 border-retro-ink fade-in-section">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="text-center mb-12">
+                <span class="text-retro-green font-bold tracking-widest block text-sm">HISTORICAL FIGURES & PORTRAITS</span>
+                <h2 class="text-3xl md:text-5xl font-black text-retro-ink">歷史風雲人物畫廊</h2>
+                <p class="text-retro-teal font-bold mt-2 text-sm md:text-base">滑鼠移入卡片檢視照片色彩變化與動態懸浮效果</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- 人物 1: 西班牙遠征隊 / 築城指揮官 -->
+                <div class="person-card bg-retro-cream p-6 border-4 border-retro-ink shadow-retro flex flex-col justify-between rounded-lg slide-in-img" style="transition-delay: 0.1s;">
+                    <div>
+                        <div class="relative w-28 h-28 mx-auto mb-4 border-2 border-retro-ink overflow-hidden rounded-full shadow-retro">
+                            <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=400&q=80" 
+                                 alt="西班牙探險隊指揮官" 
+                                 class="person-img w-full h-full object-cover grayscale contrast-125 transition-all duration-500">
+                        </div>
+                        <div class="text-center">
+                            <span class="bg-retro-red text-white text-xs font-bold px-2 py-0.5 border border-retro-ink">1629 築城時代</span>
+                            <h3 class="text-xl font-black text-retro-ink mt-2">西班牙總督與遠征隊</h3>
+                        </div>
+                        <p class="text-sm leading-relaxed text-retro-ink/90 text-justify border-t-2 border-dashed border-retro-ink pt-3 mt-3">
+                            1629年西班牙殖民官員帶領艦隊自基隆西進淡水，為建立北臺灣貿易據點與宣教基地，創立了「聖多明哥城」，開啟紅毛城古蹟歷史第一頁。
+                        </p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-retro-ink text-xs font-bold text-retro-teal text-center">
+                        關鍵貢獻：開闢淡水堡壘防線
+                    </div>
+                </div>
+
+                <!-- 人物 2: 荷蘭東印度公司長官 -->
+                <div class="person-card bg-retro-cream p-6 border-4 border-retro-ink shadow-retro flex flex-col justify-between rounded-lg slide-in-img" style="transition-delay: 0.3s;">
+                    <div>
+                        <div class="relative w-28 h-28 mx-auto mb-4 border-2 border-retro-ink overflow-hidden rounded-full shadow-retro">
+                            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80" 
+                                 alt="荷蘭東印度公司長官" 
+                                 class="person-img w-full h-full object-cover grayscale contrast-125 transition-all duration-500">
+                        </div>
+                        <div class="text-center">
+                            <span class="bg-retro-green text-white text-xs font-bold px-2 py-0.5 border border-retro-ink">1642 重建城堡</span>
+                            <h3 class="text-xl font-black text-retro-ink mt-2">荷蘭東印度公司長官</h3>
+                        </div>
+                        <p class="text-sm leading-relaxed text-retro-ink/90 text-justify border-t-2 border-dashed border-retro-ink pt-3 mt-3">
+                            1642年荷蘭軍隊北上擊敗西班牙人，將舊城拆毀後以高規格防衛結構重建堡壘，命名為「安東尼堡」（Fort Antonio），即今日人們所熟知的「紅毛城」。
+                        </p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-retro-ink text-xs font-bold text-retro-teal text-center">
+                        關鍵貢獻：賦予城堡朱紅堡壘輪廓
+                    </div>
+                </div>
+
+                <!-- 人物 3: 英國領事官員 -->
+                <div class="person-card bg-retro-cream p-6 border-4 border-retro-ink shadow-retro flex flex-col justify-between rounded-lg slide-in-img" style="transition-delay: 0.5s;">
+                    <div>
+                        <div class="relative w-28 h-28 mx-auto mb-4 border-2 border-retro-ink overflow-hidden rounded-full shadow-retro">
+                            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80" 
+                                 alt="英國外交領事" 
+                                 class="person-img w-full h-full object-cover grayscale contrast-125 transition-all duration-500">
+                        </div>
+                        <div class="text-center">
+                            <span class="bg-retro-yellow text-retro-ink text-xs font-bold px-2 py-0.5 border border-retro-ink">1867 領事館時期</span>
+                            <h3 class="text-xl font-black text-retro-ink mt-2">英國外交領事官員</h3>
+                        </div>
+                        <p class="text-sm leading-relaxed text-retro-ink/90 text-justify border-t-2 border-dashed border-retro-ink pt-3 mt-3">
+                            英國租借城堡作為外交領事館，並於東側興建極富維多利亞時代洋樓風格的領事官邸，其紅磚拱廊與綠瓶欄杆交映，成為淡水最雅緻的文化景觀。
+                        </p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-retro-ink text-xs font-bold text-retro-teal text-center">
+                        關鍵貢獻：融合英國維多利亞洋樓美學
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="travel" class="py-16 px-4 max-w-5xl mx-auto fade-in-section">
+        <div class="bg-retro-paper p-6 md:p-10 border-4 border-retro-ink shadow-retro-lg relative rounded-xl">
+            <div class="flex flex-wrap items-center justify-between border-b-2 border-retro-ink pb-4 mb-6">
+                <div>
+                    <span class="text-retro-red font-bold text-xs uppercase tracking-widest">HISTORICAL TRAVEL GUIDE</span>
+                    <h2 class="text-2xl md:text-4xl font-black text-retro-ink">歷史旅遊控漫遊提案：夕照與咖啡小憩</h2>
+                </div>
+                <div class="bg-retro-yellow text-retro-ink font-bold px-3 py-1 border border-retro-ink text-sm shadow-retro mt-2 md:mt-0">
+                    <i class="fa-solid fa-mug-hot"></i> 悠閒生活體驗
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8 items-center">
+                <div class="space-y-4 text-sm md:text-base leading-relaxed">
+                    <p class="text-justify">
+                        遊罷紅毛城，若時間充裕不妨到對面咖啡館或庭園餐廳小坐片刻。此區位在河堤公園上方，坐在小館中，悠閒的啜飲一杯咖啡，或品嚐海鮮，欣賞眼前淡水河口、觀音山景的自然風光，真是一大享受！
+                    </p>
+                    <div class="bg-retro-cream p-4 border-2 border-retro-ink shadow-retro rounded">
+                        <h4 class="font-black text-retro-red mb-2 flex items-center gap-2">
+                            <i class="fa-solid fa-sun"></i> 「戍台夕照」觀賞指南
+                        </h4>
+                        <p class="text-xs text-retro-ink/90">
+                            傍晚時分（約 17:00 - 18:30），夕陽餘暉灑落在紅毛城的紅色磚牆與淡水河面上，呈現絕美的金色霞光，是歷史旅遊愛好者不可錯過的快門瞬間。
+                        </p>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <div class="p-3 bg-retro-cream border-2 border-retro-ink shadow-retro flex gap-4 items-center rounded slide-in-img">
+                        <img src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=200&q=80" 
+                             alt="河岸景觀咖啡館" class="w-16 h-16 object-cover border border-retro-ink shrink-0 rounded">
+                        <div>
+                            <h4 class="font-bold text-retro-ink text-sm">景觀庭園咖啡館</h4>
+                            <p class="text-xs text-retro-ink/80">位居河堤公園視覺高點，靜享咖啡香與海風。</p>
+                        </div>
+                    </div>
+
+                    <div class="p-3 bg-retro-cream border-2 border-retro-ink shadow-retro flex gap-4 items-center rounded slide-in-img" style="transition-delay: 0.2s;">
+                        <img src="https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?auto=format&fit=crop&w=200&q=80" 
+                             alt="淡水海鮮美食" class="w-16 h-16 object-cover border border-retro-ink shrink-0 rounded">
+                        <div>
+                            <h4 class="font-bold text-retro-ink text-sm">河岸海鮮與特色餐飲</h4>
+                            <p class="text-xs text-retro-ink/80">品嚐淡水新鮮海鮮與在地傳統風味小吃。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div id="history-modal" class="fixed inset-0 z-50 bg-retro-ink/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-retro-paper border-4 border-retro-ink shadow-retro-lg max-w-xl w-full p-6 relative transform transition-all scale-95 opacity-0" id="modal-card">
+            <button onclick="closeHistoryModal()" class="absolute top-3 right-3 w-8 h-8 bg-retro-red text-white border-2 border-retro-ink font-bold flex items-center justify-center shadow-retro hover:bg-retro-darkred">
+                ✕
+            </button>
+            <div id="modal-content">
+                <!-- JS 動態寫入內容 -->
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-retro-ink text-retro-cream py-10 px-4 border-t-4 border-retro-red">
+        <div class="max-w-5xl mx-auto grid md:grid-cols-3 gap-8 pb-8 border-b border-retro-cream/20 text-sm">
+            <div>
+                <h3 class="text-xl font-black text-retro-red mb-3">淡水紅毛城</h3>
+                <p class="text-xs leading-relaxed text-retro-cream/80">
+                    本網站為淡水紅毛城歷史旅遊專題導覽頁面，匯集古蹟歷史演變、建築亮點與旅遊漫遊資訊。
+                </p>
+            </div>
+            <div>
+                <h4 class="font-bold text-retro-yellow mb-3">古蹟開放資訊</h4>
+                <ul class="text-xs space-y-1.5 text-retro-cream/80">
+                    <li><i class="fa-regular fa-clock text-retro-red mr-1"></i> 開放時間：09:30 - 17:00 (平日) / 18:00 (假日)</li>
+                    <li><i class="fa-solid fa-location-dot text-retro-red mr-1"></i> 地址：新北市淡水區中正路28巷1號</li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-bold text-retro-yellow mb-3">關鍵主題標籤</h4>
+                <div class="flex flex-wrap gap-2 text-xs">
+                    <span class="bg-retro-teal px-2 py-1 border border-retro-cream/30">聖多明哥城</span>
+                    <span class="bg-retro-teal px-2 py-1 border border-retro-cream/30">安東尼堡</span>
+                    <span class="bg-retro-teal px-2 py-1 border border-retro-cream/30">英國領事館</span>
+                    <span class="bg-retro-teal px-2 py-1 border border-retro-cream/30">戍台夕照</span>
+                </div>
+            </div>
+        </div>
+        <div class="text-center pt-6 text-xs text-retro-cream/60">
+            &copy; 2026 淡水紅毛城歷史旅遊網 ‧ 復古人文時光漫步
+        </div>
+    </footer>
+
+    <script>
+        // 1. 頁面載入標題淡入動態
+        window.addEventListener('DOMContentLoaded', () => {
+            const heroTitle = document.getElementById('hero-title');
+            setTimeout(() => {
+                heroTitle.classList.remove('opacity-0', 'scale-95');
+                heroTitle.classList.add('opacity-100', 'scale-100');
+            }, 150);
+        });
+
+        // 2. 行動裝置選單 Toggle
+        const menuBtn = document.getElementById('menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        menuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // 3. Scroll Reveal 區塊觀察器
+        const observerOptions = { root: null, rootMargin: '0px', threshold: 0.15 };
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-in-section').forEach(section => {
+            observer.observe(section);
+        });
+
+        // 4. JS 時間軸滾動繪製動畫 (Scroll-driven Timeline line)
+        window.addEventListener('scroll', () => {
+            const timelineContainer = document.getElementById('timeline-container');
+            const progressLine = document.getElementById('timeline-progress-line');
+            if (!timelineContainer || !progressLine) return;
+
+            const rect = timelineContainer.getBoundingClientRect();
+            const windowHeight = window.innerHeight;
+
+            if (rect.top < windowHeight && rect.bottom > 0) {
+                const totalHeight = rect.height;
+                const visibleY = windowHeight - rect.top;
+                let progressPercentage = (visibleY / totalHeight) * 100;
+                progressPercentage = Math.min(Math.max(progressPercentage, 0), 100);
+                progressLine.style.height = `${progressPercentage}%`;
+            }
+        });
+
+        // 5. 蓋印章互動 logic
+        function triggerStamp(id) {
+            const placeholder = document.getElementById(`stamp-placeholder-${id}`);
+            const mark = document.getElementById(`stamp-mark-${id}`);
+            if (!mark) return;
+
+            if (placeholder) placeholder.classList.add('hidden');
+            mark.classList.remove('hidden');
+            mark.classList.add('animate-stamp');
+
+            if (typeof anime !== 'undefined') {
+                anime({
+                    targets: mark,
+                    scale: [1.8, 1],
+                    rotate: [-12, 0],
+                    duration: 500,
+                    easing: 'easeOutElastic(1, .5)'
+                });
+            }
+        }
+
+        // 6. 地圖點位資料與動態切換 logic
+        const spotData = {
+            1: {
+                badge: "地圖點位 A",
+                title: "紅毛城主堡 (安東尼堡)",
+                img: "https://images.unsplash.com/photo-1570168007204-dfb528c6958f?auto=format&fit=crop&w=600&q=80",
+                desc: "1642年荷蘭人於舊址重建之正方形城堡，牆厚深實，兼具防衛與指揮功能。當時稱荷蘭人為「紅毛」，外牆朱紅色的城堡自此被沿用稱為「紅毛城」。"
+            },
+            2: {
+                badge: "地圖點位 B",
+                title: "前英國領事官邸 (維多利亞洋樓)",
+                img: "https://images.unsplash.com/photo-1548625361-18302322a3d0?auto=format&fit=crop&w=800&q=80",
+                desc: "1891年竣工之兩層紅磚洋樓，具備優美的雙層半圓拱廊、綠釉瓶欄杆與斜頂長廊構造，充滿濃厚的維多利亞時代建築美學與歷史風貌。"
+            },
+            3: {
+                badge: "地圖點位 C",
+                title: "南門與古砲區",
+                img: "https://images.unsplash.com/photo-1569317002804-ab77bcf1bce4?auto=format&fit=crop&w=600&q=80",
+                desc: "園區保存有清代南門遺構以及前院展示的各式阿姆斯特朗古砲，記錄著淡水港口昔日險要的軍事要塞形勢。"
+            },
+            4: {
+                badge: "地圖點位 D",
+                title: "夕照平台與周邊小館",
+                img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80",
+                desc: "位於河堤公園上方，由此俯瞰淡水河與觀音山景，景色壯麗。「戍台夕照」素為淡水八景之一。對面更有許多庭園咖啡館與海鮮餐廳。"
+            }
+        };
+
+        function selectSpot(spotId) {
+            const data = spotData[spotId];
+            if (!data) return;
+
+            const container = document.getElementById('spot-info');
+            container.style.opacity = '0';
+            container.style.transform = 'translateY(10px)';
+            container.style.transition = 'all 0.25s ease';
+
+            setTimeout(() => {
+                container.innerHTML = `
+                    <div class="inline-block bg-retro-red text-white text-xs font-bold px-2 py-1 mb-2 border border-retro-ink">
+                        ${data.badge}
+                    </div>
+                    <h3 class="text-2xl font-black text-retro-ink mb-3">${data.title}</h3>
+                    <div class="border-b-2 border-retro-ink pb-3 mb-4">
+                        <img src="${data.img}" alt="${data.title}" class="w-full h-44 object-cover border-2 border-retro-ink mb-2 rounded" onerror="this.src='https://placehold.co/600x400/C84B31/FFF?text=淡水古蹟照片'">
+                    </div>
+                    <p class="text-sm leading-relaxed text-retro-ink/90">
+                        ${data.desc}
+                    </p>
+                `;
+                container.style.opacity = '1';
+                container.style.transform = 'translateY(0)';
+            }, 250);
+        }
+
+        // 7. 時間軸互動彈窗 (Modal)
+        const modalData = {
+            1629: {
+                year: "西元 1629 年",
+                title: "西班牙建造聖多明哥城",
+                img: "https://images.unsplash.com/photo-1569317002804-ab77bcf1bce4?auto=format&fit=crop&w=600&q=80",
+                desc: "1629年西班牙人侵略淡水，為了鞏固其在北臺灣的殖民事業與貿易利益，於淡水河口山丘興建木石結構的「聖多明哥城」（San Domingo）作為基地。"
+            },
+            1642: {
+                year: "西元 1642 年",
+                title: "荷蘭重建安東尼堡 (紅毛城)",
+                img: "https://images.unsplash.com/photo-1570168007204-dfb528c6958f?auto=format&fit=crop&w=600&q=80",
+                desc: "1642年荷蘭人驅逐西班牙人，在舊址重建該城，命名為安東尼堡。當時臺灣北部居民稱荷蘭人為「紅毛」，因此「紅毛城」之名也沿用至今。"
+            },
+            1867: {
+                year: "西元 1867 年",
+                title: "英國租借與建立領事官邸",
+                img: "https://images.unsplash.com/photo-1548625361-18302322a3d0?auto=format&fit=crop&w=800&q=80",
+                desc: "1867年為英國所租借，乃大肆整修，並在東側興建「英國領事官邸」。領事官邸具雙層紅色拱廊、綠釉瓶欄杆與斜頂長廊，與紅毛城相互輝映。"
+            },
+            1980: {
+                year: "西元 1980 年",
+                title: "官方正式收回接管",
+                img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80",
+                desc: "紅毛城一直到民國69年（西元1980年）才收回接管。由此俯視淡水河，形勢險要，『戍台夕照』素為淡水八景之一，集古蹟與勝景於一處。"
+            }
+        };
+
+        function openHistoryModal(year) {
+            const data = modalData[year];
+            if (!data) return;
+
+            const modal = document.getElementById('history-modal');
+            const modalCard = document.getElementById('modal-card');
+            const modalContent = document.getElementById('modal-content');
+
+            modalContent.innerHTML = `
+                <span class="bg-retro-red text-white text-xs font-bold px-2 py-0.5 border border-retro-ink">${data.year}</span>
+                <h3 class="text-2xl font-black text-retro-ink mt-2 mb-3">${data.title}</h3>
+                <img src="${data.img}" alt="${data.title}" class="w-full h-48 object-cover border-2 border-retro-ink mb-4 shadow-retro">
+                <p class="text-sm leading-relaxed text-retro-ink/90">${data.desc}</p>
+            `;
+
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modalCard.classList.remove('scale-95', 'opacity-0');
+                modalCard.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        function closeHistoryModal() {
+            const modal = document.getElementById('history-modal');
+            const modalCard = document.getElementById('modal-card');
+
+            modalCard.classList.remove('scale-100', 'opacity-100');
+            modalCard.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 200);
+        }
+    </script>
+</body>
+</html>
